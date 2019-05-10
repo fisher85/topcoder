@@ -5,6 +5,8 @@
 # https://scikit-learn.org/stable/auto_examples/cluster/plot_dbscan.html
 # Finds core samples of high density and expands clusters from them.
 
+# c:\Users\Дима\AppData\Local\Programs\Python\Python37-32\Scripts\pip3.exe install sklearn
+
 import numpy as np
 
 from sklearn.cluster import DBSCAN
@@ -19,18 +21,22 @@ X, labels_true = make_blobs(n_samples=750, centers=centers, cluster_std=0.4,
                             random_state=0)
 
 X = StandardScaler().fit_transform(X)
+print(type(X))
 
 # #############################################################################
 # No, thanks, read data from file
+with open("2019-05-10 Yandex ML blitz 2018/input1.csv", "r") as fr:
+      input_lines = fr.readlines()
+      b = int(input_lines[0])
+      X = [[int(num) for num in line.split(",")] for line in input_lines[1:]]
 
-import pandas as pd
-
-points = pd.read_csv("2019-05-10 Yandex ML blitz 2018/input1.csv", header=None)
-print(points)
+X = np.array(X)
+print(type(X))
 
 # #############################################################################
 # Compute DBSCAN
-db = DBSCAN(eps=0.3, min_samples=10).fit(X)
+# No, и is not eps! 
+db = DBSCAN(eps=b, min_samples=2).fit(X)
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
@@ -41,15 +47,15 @@ n_noise_ = list(labels).count(-1)
 
 print('Estimated number of clusters: %d' % n_clusters_)
 print('Estimated number of noise points: %d' % n_noise_)
-print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
-print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
-print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
-print("Adjusted Rand Index: %0.3f"
-      % metrics.adjusted_rand_score(labels_true, labels))
-print("Adjusted Mutual Information: %0.3f"
-      % metrics.adjusted_mutual_info_score(labels_true, labels))
-print("Silhouette Coefficient: %0.3f"
-      % metrics.silhouette_score(X, labels))
+# print("Homogeneity: %0.3f" % metrics.homogeneity_score(labels_true, labels))
+# print("Completeness: %0.3f" % metrics.completeness_score(labels_true, labels))
+# print("V-measure: %0.3f" % metrics.v_measure_score(labels_true, labels))
+# print("Adjusted Rand Index: %0.3f"
+#       % metrics.adjusted_rand_score(labels_true, labels))
+# print("Adjusted Mutual Information: %0.3f"
+#       % metrics.adjusted_mutual_info_score(labels_true, labels))
+# print("Silhouette Coefficient: %0.3f"
+#      % metrics.silhouette_score(X, labels))
 
 # #############################################################################
 # Plot result
