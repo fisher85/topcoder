@@ -25,7 +25,7 @@ print(type(X))
 
 # #############################################################################
 # No, thanks, read data from file
-with open("2019-05-10 Yandex ML blitz 2018/input1.csv", "r") as fr:
+with open("2019-05-10 Yandex ML blitz 2018/input1_1.csv", "r") as fr:
       input_lines = fr.readlines()
       b = int(input_lines[0])
       X = [[int(num) for num in line.split(",")] for line in input_lines[1:]]
