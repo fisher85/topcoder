@@ -1,7 +1,7 @@
 file_input = "2019-05-21 Yandex ML 2019/Task A/input.txt"
 file_output = "2019-05-21 Yandex ML 2019/Task A/output.txt"
-# file_input = "input.txt"
-# file_output = "output.txt"
+file_input = "input.txt"
+file_output = "output.txt"
 
 with open(file_input, "r") as fr, open(file_output, "w") as fw:
     input_lines = fr.readlines()
