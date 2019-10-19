@@ -1,0 +1,16 @@
+5
+abcab
+7
+abbabba
+5
+ab#ba
+6
+######
+9
+abc#bcacc
+9
+#bc#bccbc
+20
+abcdbdhfkshfiwefhskr
+7
+c#bca#c
