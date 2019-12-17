@@ -39,15 +39,24 @@ start_time = time.time()
 final_pre_path = "2019-10-19 Yandex ML Contest/Final - Predictions of topics in the text/"
 completion_pre_path = "2019-10-19 Yandex ML Contest/Completion/"
 input_file = final_pre_path + "train.tsv"
-max_input_lines = 3000 # из 126325
+# При max_input_lines = 3000 вывод одного классификатора занимает 7 минут
+max_input_lines = 10000 # из 126325 
 max_output_lines = 50000 # из ~30000
+# Сколько классификаторов учить
+max_clfs = 1
 
 # Обучать модель? Или взять сохраненную модель
-learn_it = True
-model_version = 7
+learn_it = True 
+model_version = 9
 
 X = []
+
 y = []
+"""
+for clf_index in range(0, max_clfs):
+    y.append([])
+"""
+
 count = 0
 with open(input_file, "r", encoding="utf-8") as fr:
     for input_line in fr:
@@ -64,15 +73,28 @@ with open(input_file, "r", encoding="utf-8") as fr:
         text_labels = splits[3].strip()
 
         labels = [int(num) for num in text_labels.split(',')] 
+
         # Текст = заголовок + текст
         X.append(topic + text)
-        # One-label classification: y.append(labels[0])
-        # Multi-label classification: y.append(labels)
         y.append(labels[0])
+"""
+        for clf_index in range(0, max_clfs):
+            # One-label classification: y.append(labels[0])
+            # Multi-label classification: y.append(labels)
+            if (clf_index in labels):
+                y[clf_index].append(1)
+            else:
+                y[clf_index].append(0)
+"""     
+"""
+       if (model_version == 9):
+            # y[clf_index].clear()
+            # y[clf_index].append(labels[0])
+"""
+            
 
-        # Предобработка текста и уборка мусора
-        # Преобразование регистра пропускаем, векторайзер сделает
-
+# Предобработка текста и уборка мусора
+# Преобразование регистра пропускаем, векторайзер сделает
 print("Обработка TF-IDF...")
 
 stop_words = []
@@ -85,7 +107,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 vectorizer = TfidfVectorizer(stop_words=stop_words)
 X = vectorizer.fit_transform(X)
 words = vectorizer.get_feature_names()
-print("Время векторизации:", len(y), (time.time() - start_time))
+print("Время векторизации:", (time.time() - start_time))
 # Время векторизации:  29920 записей - 20.52900218963623 секунд, БЫСТРО
 
 print("Обучение модели...")
@@ -98,21 +120,32 @@ minC = 10
 import pickle
 
 if (learn_it == True):
+    
     # Версия 2
     clf = SVC(kernel='linear', C=minC, random_state=241)
     clf.fit(X, y)
     y_pred = clf.predict(X[1])
     print(y_pred[0])    
-
+    
+    """
+    # Версия 7
+    clfs = []
+    for clf_index in range(0, max_clfs):
+        clfs.append(SVC(kernel='linear', C=minC, random_state=241))
+        clfs[clf_index].fit(X, y[clf_index])
+        print("  Обучен классификатор", (clf_index + 1), (time.time() - start_time))
+        with open(f"{completion_pre_path}finalmodel-{model_version}-clf-{clf_index}.pkl", 'wb') as f:
+            pickle.dump(clfs[clf_index], f)
+    """
     print("Время обучения модели:", (time.time() - start_time))
 
-    with open(f"{completion_pre_path}finalmodel{model_version}.pkl", 'wb') as f:
-        pickle.dump(clf, f)
-
 else:
-
-    with open(f"{completion_pre_path}finalmodel{model_version}.pkl", 'rb') as f:
-        clf = pickle.load(f)
+    
+    clfs = []
+    for clf_index in range(0, max_clfs):
+        with open(f"{completion_pre_path}finalmodel-{model_version}-clf-{clf_index}.pkl", 'rb') as f:
+            clf = pickle.load(f)
+            clfs.append(clf) 
 
 # Вывод результатов
 print("Вывод результатов...")
@@ -126,6 +159,8 @@ count = 0
 with open(test_file, "r", encoding="utf-8") as fr, open(output_file, "w") as fw:
     for input_line in fr:
         count += 1
+        if (count % 100 == 0):
+            print(count, (time.time() - start_time))
         # Строк в файле test - ~30000, 6 минут на вывод
         # Индексы от 126048 до 157560, всего 31512
         if (count > max_output_lines): break
@@ -142,10 +177,19 @@ with open(test_file, "r", encoding="utf-8") as fr, open(output_file, "w") as fw:
         X = []
         X.append(topic + text)
         X = vectorizer.transform(X)
-        y = clf.predict(X[0])
 
+        prediction = clf.predict(X[0])
         y_indexes = []
-        y_indexes.append(str(y[0]))
+        y_indexes.append(str(prediction[0]))
+
+        """
+        y_indexes = []
+        # Считали тестовую запись, все 1 от предсказаний всеx классификаторов записываем в y_indexes
+        for clf_index in range(0, max_clfs):
+            prediction = clfs[clf_index].predict(X[0])
+            if (prediction[0] == 1):
+                y_indexes.append(str(clf_index))
+        """
 
         """
         y_indexes = []
@@ -156,9 +200,16 @@ with open(test_file, "r", encoding="utf-8") as fr, open(output_file, "w") as fw:
             ind += 1
         """
 
-        if (len(y_indexes) < 1): y_indexes.append("999")
+        if (len(y_indexes) < 1): y_indexes.append("0")
         res_string = ",".join(y_indexes)
 
         print(f"{index}\t{res_string}", file=fw)
 
 print("Время вывода результатов:", count, (time.time() - start_time))
+
+# Пробы
+# 100 clfs, 1000 записей для обучения и 100 для вывода = 100 секунд на обучение, 20 секунд на вывод
+# 100 clfs, 2000 записей для обучения и 1000 для вывода = 300 секунд на обучение, 240 секунд на вывод
+# 100 clfs, 5000 записей для обучения и 100 для вывода =  1222 секунд на обучение, 38 секунд на вывод
+# 100 clfs, 10000 записей для обучения и 10 для вывода = 1 час на обучение (по 40-50 секунд на классификатор), 5 часов на вывод
+#  
