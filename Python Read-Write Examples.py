@@ -1,3 +1,18 @@
+k = int(input())
+distr = {}
+for _ in range(k):
+    next_line = input().split()
+    for i in next_line[1:]:
+        if i in distr:
+            distr[i] += 1
+        else:
+            distr[i] = 1
+
+for i in range(101):
+    i = str(i)
+    if i in distr:
+        print(' '.join([i] * distr[i]), end=' ')
+
 # Чтение из файла
 fr = open("input.txt", "r")
 line = fr.readline()
