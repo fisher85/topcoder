@@ -1,5 +1,7 @@
 # A. Решающий пень
 
+# Назовём функцию, зависящую от трёх параметров — a, b, c — решающим пнём.
+
 # Сомнительно, что есть аналитический способ решения такой задачи. Решаем перебором.
 # Для решения задачи достаточно отсортировать все точки по Х и пытаться построить границу C пня
 # между всеми парами точек. Тогда среднее значение Mean для левой части = A, Mean для правой = B.
@@ -91,14 +93,14 @@ class Dots():
 
         return bestA, bestB, bestC
 
-file_name = "c:\\topcoder\\topcoder\\2019-05-12 Yandex ML blitz 2018 final\\input_A_1.txt"
+file_name = "c:\\topcoder\\topcoder\\2020-09-30 Yandex ML Contest\\Warm-up\\input_A_1.txt"
 # file_name = "stump.in"
 
 dots = Dots()
 dots.read(file_name)
 a, b, c = dots.Solve()
 
-output_name = "c:\\topcoder\\topcoder\\2019-05-12 Yandex ML blitz 2018 final\\output_A_1.txt"
+output_name = "c:\\topcoder\\topcoder\\2020-09-30 Yandex ML Contest\\Warm-up\\output_A_1.txt"
 # output_name = "stump.out"
 
 with open(output_name, "w") as fw:
