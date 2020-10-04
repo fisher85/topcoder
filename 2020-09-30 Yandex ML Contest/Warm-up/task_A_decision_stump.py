@@ -94,6 +94,7 @@ class Dots():
         return bestA, bestB, bestC
 
 file_name = "c:\\topcoder\\topcoder\\2020-09-30 Yandex ML Contest\\Warm-up\\input_A_1.txt"
+file_name = "D:\\Container\\Python Projects\\2020-09-30 Yandex ML Contest\\Warm-up\\input_A_1.txt"
 # file_name = "stump.in"
 
 dots = Dots()
@@ -101,6 +102,7 @@ dots.read(file_name)
 a, b, c = dots.Solve()
 
 output_name = "c:\\topcoder\\topcoder\\2020-09-30 Yandex ML Contest\\Warm-up\\output_A_1.txt"
+output_name = "D:\\Container\\Python Projects\\2020-09-30 Yandex ML Contest\\Warm-up\\output_A_1.txt"
 # output_name = "stump.out"
 
 with open(output_name, "w") as fw:
@@ -112,6 +114,8 @@ with open(output_name, "w") as fw:
 # https://matplotlib.org/tutorials/introductory/pyplot.html#sphx-glr-tutorials-introductory-pyplot-py
 
 # За прокси: pip install matplotlib --proxy http://stepin_aa:saa@10.0.0.1:3128
+
+print(str.format("{0:.6f}", a) + " " + str.format("{0:.6f}", b) + " " + str.format("{0:.6f}", c))
 
 import numpy as np
 import matplotlib.pyplot as plt
